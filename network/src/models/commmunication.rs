@@ -18,6 +18,14 @@ pub struct FragmentTask {
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
+pub struct FragmentResult {
+    pub id: U8Data,
+    pub resolution: Resolution,
+    pub range: Range, 
+    pub pixels: PixelData
+}
+
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub enum NetworkProtocoles {
     FragmentRequest(FragmentRequest),
     FragmentTask(FragmentTask)
@@ -54,7 +62,7 @@ pub struct Resolution {
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
-struct PixelData {
+pub struct PixelData {
     pub offset: u32,
     pub count: u32
 }

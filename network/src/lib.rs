@@ -61,8 +61,8 @@ impl Network {
         Network::_send_message(stream, work_serialized, "".to_string())?;
 
         match Network::_read_message(stream) {
-            Ok(NetworkProtocoles::FragmentTask(fragment_task)) => Ok(fragment_task),
-            Ok(NetworkProtocoles::FragmentRequest(_)) => Err(io::Error::new(
+            Ok((NetworkProtocoles::FragmentTask(fragment_task), _ )) => Ok(fragment_task),
+            Ok((NetworkProtocoles::FragmentRequest(_), _ )) => Err(io::Error::new(
                 io::ErrorKind::UnexpectedEof,
                 "Not the right response type",
             )),
@@ -73,8 +73,8 @@ impl Network {
     pub fn get_work_request(stream: &mut TcpStream) -> Result<FragmentRequest, io::Error> {
 
         match Network::_read_message(stream) {
-            Ok(NetworkProtocoles::FragmentRequest(fragment)) => Ok(fragment),
-            Ok(NetworkProtocoles::FragmentTask(_)) => Err(io::Error::new(
+            Ok((NetworkProtocoles::FragmentRequest(fragment), _ )) => Ok(fragment),
+            Ok((NetworkProtocoles::FragmentTask(_), _ )) => Err(io::Error::new(
                 io::ErrorKind::UnexpectedEof,
                 "Did not send a job request",
             )),
@@ -145,7 +145,7 @@ impl Network {
         Ok(())
     }
 
-    fn _read_message(stream: &mut TcpStream) -> Result<NetworkProtocoles, io::Error> {
+    fn _read_message(stream: &mut TcpStream) -> Result<(NetworkProtocoles, Vec<u8>), io::Error> {
         let mut total_len_buf = [0; 4];
         stream.read_exact(&mut total_len_buf)?;
         let total_message_size = u32::from_be_bytes(total_len_buf);
@@ -177,10 +177,9 @@ impl Network {
             }
         };
 
-        let mut data_len_buf = vec![0_u8; data_message_size as usize];
-        stream.read(&mut data_len_buf)?;
-        // let data = String::from_utf8_lossy(&data_len_buf);
+        let mut data = vec![0_u8; data_message_size as usize];
+        stream.read(&mut data)?;
 
-        Ok(fragment)
+        Ok((fragment, data))
     }
 }
