@@ -2,7 +2,7 @@ pub mod models;
 mod utils;
 mod lib_test;
 
-use log::{debug, trace};
+use log::info;
 use models::{
     commmunication::{
         FragmentRequest, 
@@ -62,8 +62,8 @@ impl Network {
         Network::_send_message(stream, work_serialized, "".to_string())?;
 
         match Network::_read_message(stream) {
-            Ok((NetworkProtocoles::FragmentTask(fragment_task), _ )) => Ok(fragment_task),
-            Ok((NetworkProtocoles::FragmentRequest(_), _ )) => Err(io::Error::new(
+            Ok(NetworkProtocoles::FragmentTask(fragment_task)) => Ok(fragment_task),
+            Ok(NetworkProtocoles::FragmentRequest(_)) => Err(io::Error::new(
                 io::ErrorKind::UnexpectedEof,
                 "Not the right response type",
             )),
@@ -74,8 +74,8 @@ impl Network {
     pub fn get_work_request(stream: &mut TcpStream) -> Result<FragmentRequest, io::Error> {
 
         match Network::_read_message(stream) {
-            Ok((NetworkProtocoles::FragmentRequest(fragment), _ )) => Ok(fragment),
-            Ok((NetworkProtocoles::FragmentTask(_), _ )) => Err(io::Error::new(
+            Ok(NetworkProtocoles::FragmentRequest(fragment)) => Ok(fragment),
+            Ok(NetworkProtocoles::FragmentTask(_)) => Err(io::Error::new(
                 io::ErrorKind::UnexpectedEof,
                 "Did not send a job request",
             )),
@@ -143,12 +143,12 @@ impl Network {
         stream.write(&json_message.as_bytes())?;
         stream.write(&data.as_bytes())?;
 
-        debug!("Sent message : {json_message}", );
+        info!("Sent message : {json_message}", );
 
         Ok(())
     }
 
-    fn _read_message(stream: &mut TcpStream) -> Result<(NetworkProtocoles, Vec<u8>), io::Error> {
+    fn _read_message(stream: &mut TcpStream) -> Result<NetworkProtocoles, io::Error> {
         let mut total_len_buf = [0; 4];
         stream.read_exact(&mut total_len_buf)?;
         let total_message_size = u32::from_be_bytes(total_len_buf);
@@ -169,9 +169,6 @@ impl Network {
         let mut sbuf = vec![0_u8; json_message_size as usize];
         stream.read(&mut sbuf)?;
         let s = String::from_utf8_lossy(&sbuf);
-
-        debug!("Message received : {s}");
-
         let fragment_request = json::to_fragment(&s.to_string());
         let fragment = match fragment_request {
             Ok(r) => r,
@@ -183,10 +180,10 @@ impl Network {
             }
         };
 
-        let mut data = vec![0_u8; data_message_size as usize];
-        stream.read(&mut data)?;
-        trace!("Data received : {:?}", data);
+        let mut data_len_buf = vec![0_u8; data_message_size as usize];
+        stream.read(&mut data_len_buf)?;
+        // let data = String::from_utf8_lossy(&data_len_buf);
 
-        Ok((fragment, data))
+        Ok(fragment)
     }
 }
