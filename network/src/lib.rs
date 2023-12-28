@@ -143,7 +143,7 @@ impl Network {
         stream.write(&json_message.as_bytes())?;
         stream.write(&data.as_bytes())?;
 
-        debug!("Sent message : {json_message}", );
+        debug!("Sent message : {json_message}");
 
         Ok(())
     }

@@ -1,7 +1,8 @@
 use clap::Parser;
 use env_logger::Env;
+use frakt_trc::Fractal;
 use log::{info, error, debug};
-use network::{models::commmunication::FragmentTask, Network};
+use network::{models::commmunication::{FragmentTask, FragmentResult, PixelData}, Network};
 use std::{io, process};
 
 #[derive(Parser, Debug)]
@@ -61,6 +62,18 @@ fn main() -> io::Result<()> {
     };
 
     debug!("FragmentTask from server : {:?}", fragment_task);
+
+    let mut fragment_result = FragmentResult {
+        id: fragment_task.id,
+        resolution: fragment_task.resolution,
+        range: fragment_task.range,
+        pixels: PixelData {
+            offset: 0,
+            count: 0
+        }
+    };
+
+    Fractal::calculate_iterations(&mut fragment_result);
 
     Ok(())
 }

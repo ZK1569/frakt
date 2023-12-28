@@ -2,7 +2,8 @@
 members = [
     "jerry-smith",
     "mr-meeseeks",
-    "network"
+    "network",
+    "frakt-trc"
 ]
 resolver = "2"
 default-members = [

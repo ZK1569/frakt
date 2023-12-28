@@ -135,6 +135,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "frakt-trc"
+version = "0.1.0"
+dependencies = [
+ "log",
+ "network",
+]
+
+[[package]]
 name = "heck"
 version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -211,6 +219,7 @@ version = "0.1.0"
 dependencies = [
  "clap",
  "env_logger",
+ "frakt-trc",
  "log",
  "network",
 ]
