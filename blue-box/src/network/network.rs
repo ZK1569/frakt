@@ -1,4 +1,4 @@
-use log::{debug, trace, info, warn};
+use log::{debug, info, trace, warn};
 
 use std::{
     io::{self, Read, Write},
@@ -16,7 +16,6 @@ pub struct Network {
 }
 
 impl Network {
-
     pub fn new(server_address: String, port: String) -> Network {
         Network {
             server_address,
@@ -42,20 +41,19 @@ impl Network {
         stream.write_all(&json_message.as_bytes())?;
         stream.write_all(&data)?;
 
-        debug!("Sent message : {json_message}", );
+        debug!("Sent message : {json_message}",);
 
         Ok(())
     }
 
     pub fn read_message(stream: &mut TcpStream) -> Result<(NetworkProtocoles, Vec<u8>), io::Error> {
         let mut total_len_buf = [0; 4];
-        match stream.read_exact(&mut total_len_buf){
+        match stream.read_exact(&mut total_len_buf) {
             Ok(_) => debug!("Start getting something"),
             Err(err) => {
                 warn!("Something's wrong, I can't receive the total message size");
                 return Err(err);
-            } 
-            
+            }
         };
         let total_message_size = u32::from_be_bytes(total_len_buf);
 

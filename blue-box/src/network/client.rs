@@ -1,20 +1,21 @@
-use std::{net::TcpStream, io};
+use std::{io, net::TcpStream};
 
 use crate::utils::json;
 
-use super::{network::Network, communication_types::{FragmentTask, FragmentRequest, NetworkProtocoles, FragmentResult}};
-
+use super::{
+    communication_types::{FragmentRequest, FragmentResult, FragmentTask, NetworkProtocoles},
+    network::Network,
+};
 
 #[derive(Debug)]
 pub struct Client {
-    network: Network
+    network: Network,
 }
 
 impl Client {
-
     pub fn new(server_address: String, port: String) -> Client {
         Client {
-            network: Network::new(server_address, port)
+            network: Network::new(server_address, port),
         }
     }
 
@@ -40,19 +41,23 @@ impl Client {
 
         match Network::read_message(stream) {
             Ok((NetworkProtocoles::FragmentTask(fragment_task), data)) => Ok((fragment_task, data)),
-            Ok((NetworkProtocoles::FragmentRequest(_), _ )) => Err(io::Error::new(
+            Ok((NetworkProtocoles::FragmentRequest(_), _)) => Err(io::Error::new(
                 io::ErrorKind::UnexpectedEof,
                 "Not the right response type returned FragmentRequest",
             )),
-            Ok((NetworkProtocoles::FragmentResult(_), _ )) => Err(io::Error::new(
+            Ok((NetworkProtocoles::FragmentResult(_), _)) => Err(io::Error::new(
                 io::ErrorKind::UnexpectedEof,
                 "Not the right response type returned FragmentResult",
             )),
             Err(err) => Err(err),
         }
     }
-    
-    pub fn send_work_done(stream: &mut TcpStream, fragment_result: FragmentResult, data: Vec<u8>) -> Result<(), io::Error> {
+
+    pub fn send_work_done(
+        stream: &mut TcpStream,
+        fragment_result: FragmentResult,
+        data: Vec<u8>,
+    ) -> Result<(), io::Error> {
         let enum_network = NetworkProtocoles::FragmentResult(fragment_result);
         let work_serialized = json::to_string(&enum_network)?;
 
@@ -60,5 +65,4 @@ impl Client {
 
         Ok(())
     }
-
 }

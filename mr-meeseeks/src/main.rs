@@ -1,9 +1,15 @@
 mod utils;
 
-use blue_box::{network::{client::Client, communication_types::{FragmentTask, FragmentResult, PixelData}}, fractal::fractal::Fractal};
+use blue_box::{
+    fractal::fractal::Fractal,
+    network::{
+        client::Client,
+        communication_types::{FragmentResult, FragmentTask, PixelData},
+    },
+};
 use clap::Parser;
 use env_logger::Env;
-use log::{error, debug, info, warn};
+use log::{debug, error, info, warn};
 use std::{io, process};
 
 use crate::utils::start_util;
@@ -30,9 +36,9 @@ struct Args {
 
 fn main() -> io::Result<()> {
     start_util::start_message();
-    
+
     env_logger::Builder::from_env(Env::default().default_filter_or("debug")).init();
-    // INFO: Log levels: 
+    // INFO: Log levels:
     //  error
     //  warn
     //  info
@@ -61,7 +67,7 @@ fn main() -> io::Result<()> {
             // INFO: I don't know if the data returned by the server at the same time as the fragment_task is important.
             // data = data_in;
             fragment
-        },
+        }
         Err(err) => {
             error!("Something went wrong: {}", err);
             process::exit(1)
@@ -76,16 +82,16 @@ fn main() -> io::Result<()> {
         range: fragment_task.range.clone(),
         pixels: PixelData {
             offset: 0_u32,
-            count: 0_u32
-        }
+            count: 0_u32,
+        },
     };
 
     Fractal::run(&fragment_task, &mut fragment_result, &mut data);
-    
+
     let response = Client::send_work_done(&mut stream, fragment_result, data);
     match response {
         Ok(_) => info!("Result sent to server"),
-        Err(err) => warn!("Can't send result to server: {err}")
+        Err(err) => warn!("Can't send result to server: {err}"),
     }
 
     Ok(())
