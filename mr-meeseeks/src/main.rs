@@ -10,7 +10,7 @@ use blue_box::{
 use clap::Parser;
 use env_logger::Env;
 use log::{debug, error, info, warn};
-use std::{io, process};
+use std::{io::{self, Write}, process};
 
 use crate::utils::start_util;
 
@@ -65,7 +65,7 @@ fn main() -> io::Result<()> {
     let fragment_task: FragmentTask = match fractal_task_request {
         Ok((fragment, data_in)) => {
             // INFO: I don't know if the data returned by the server at the same time as the fragment_task is important.
-            // data = data_in;
+            data = data_in;
             fragment
         }
         Err(err) => {
@@ -81,13 +81,23 @@ fn main() -> io::Result<()> {
         resolution: fragment_task.resolution.clone(),
         range: fragment_task.range.clone(),
         pixels: PixelData {
-            offset: 0_u32,
-            count: 0_u32,
+            offset: fragment_task.id.count,
+            count: fragment_task.resolution.nx as u32 * fragment_task.resolution.ny as u32,
         },
     };
 
-    Fractal::run(&fragment_task, &mut fragment_result, &mut data);
+    // Fractal::run(&fragment_task, &mut fragment_result, &mut data);
 
+    let zn: f32 = 0.018979378;
+    let count: f32 = 1.0;
+    data.write_all(&zn.to_be_bytes());
+    data.write_all(&count.to_be_bytes());
+
+    for &num in &data{
+        print!("{:#x}, ", num);
+    }
+
+    // WARN: The server do not get the response
     let response = Client::send_work_done(&mut stream, fragment_result, data);
     match response {
         Ok(_) => info!("Result sent to server"),
@@ -96,3 +106,4 @@ fn main() -> io::Result<()> {
 
     Ok(())
 }
+

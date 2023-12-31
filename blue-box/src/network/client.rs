@@ -1,5 +1,7 @@
 use std::{io, net::TcpStream};
 
+use log::debug;
+
 use crate::utils::json;
 
 use super::{
