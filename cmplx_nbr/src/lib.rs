@@ -30,13 +30,12 @@ impl Complex {
     }
 
     /// It is possible to obtain the sine of a complex number, which returns a new complex number
-    pub fn sin(&self)-> Complex{
-        Complex{
-            re:(self.re.sin() * self.im.cosh()),
-            im:(self.re.cos() * self.im.sinh())
+    pub fn sin(&self) -> Complex {
+        Complex {
+            re: (self.re.sin() * self.im.cosh()),
+            im: (self.re.cos() * self.im.sinh()),
         }
     }
-
 }
 
 /// You can add compelx numbers together
@@ -59,4 +58,3 @@ impl ops::Mul for Complex {
         Self { re, im }
     }
 }
-
