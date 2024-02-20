@@ -36,5 +36,4 @@ fn cal_norm() {
     assert_eq!(13.0, _3_2i.norm());
     assert_eq!(50.0, _1_7i.norm());
     assert_eq!(650.0, __11_23i.norm());
-
 }

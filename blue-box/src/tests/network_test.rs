@@ -8,5 +8,8 @@ fn test_network_new_and_get_fulladdress() {
     let port = "8080".to_string();
     let network = Network::new(server_address.clone(), port.clone());
 
-    assert_eq!(network.get_fulladdress(), format!("{}:{}", server_address, port));
+    assert_eq!(
+        network.get_fulladdress(),
+        format!("{}:{}", server_address, port)
+    );
 }
