@@ -1,10 +1,10 @@
-use std::{sync::mpsc::Receiver, u64};
+use std::sync::mpsc::Receiver;
 
-use blue_box::{utils::colors::{color_palette, self}, types::desc::PixelIntensity};
-use log::{info, warn, debug};
+use blue_box::{utils::colors::color_palette, types::desc::PixelIntensity};
+
 use pixels::{SurfaceTexture, Pixels, Error};
 use winit::{
-    dpi::{LogicalSize},
+    dpi::LogicalSize,
     window::WindowBuilder,
     event_loop::{EventLoop, ControlFlow},
     event::Event,
@@ -28,7 +28,7 @@ impl DisplayFractal{
     pub fn start(&self, rx: Receiver<Vec<PixelIntensity>>) -> Result<(), Error> {
 
         let event_loop = EventLoop::new();
-        let mut input = WinitInputHelper::new();
+        let _input = WinitInputHelper::new();
 
         let window = {
             let size = LogicalSize::new(self.width as f64, self.height as f64);
@@ -52,12 +52,12 @@ impl DisplayFractal{
                     pixels.frame_mut(),
                     colors
                 );
-                pixels.render();
+                let _ = pixels.render();
             }
 
             // Draw the current frame
             if let Event::RedrawRequested(_) = event {
-                if let Err(err) = pixels.render() {
+                if let Err(_err) = pixels.render() {
                     *control_flow = ControlFlow::Exit;
                     return;
                 }

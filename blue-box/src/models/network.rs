@@ -91,6 +91,6 @@ impl Network  {
     }
 
     pub fn close_connection(stream: &mut TcpStream) {
-        stream.shutdown(Shutdown::Both);
+        let _ = stream.shutdown(Shutdown::Both);
     }
 }

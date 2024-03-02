@@ -33,8 +33,6 @@ use rand::Rng;
 #[derive(Debug)]
 pub struct Server {
     network: Network,
-    width: u16,
-    height: u16
 }
 
 impl Server {
@@ -42,13 +40,11 @@ impl Server {
     pub fn new(
         server_address: String,
         port: String,
-        width: u16,
-        height: u16
+        _width: u16,
+        _height: u16
     ) -> Server{
         Server {
             network: Network::new(server_address, port),
-            width,
-            height
         }
     }
 
@@ -62,7 +58,7 @@ impl Server {
 
     pub fn send_work(
         stream: &mut TcpStream,
-        fragment_request: &FragmentRequest
+        _fragment_request: &FragmentRequest
     ) -> Result<(), io::Error> {
         let test_fragment_task = FragmentTask {
             id: U8Data {
@@ -100,7 +96,7 @@ impl Server {
         warn!("fragment : {fragment_result:?}");
         trace!("Data recived : {data:?}");
 
-        tx.send(Server::from_data_to_pixel_intensity(&data[16..]));
+        let _ = tx.send(Server::from_data_to_pixel_intensity(&data[16..]));
 
         Ok(())
     }
@@ -114,11 +110,11 @@ impl Server {
         match Server::read_messge_from_client(stream){
             Ok((Fragment::FragmentRequest(fragment), _)) => {
                 debug!("Work request received");
-                Server::send_work(stream, &fragment);
+                let _ = Server::send_work(stream, &fragment);
             },
             Ok((Fragment::FragmentResult(fragment), data)) => {
                 debug!("Work done");
-                Server::get_work_done(&fragment, data, tx);
+                let _ = Server::get_work_done(&fragment, data, tx);
             },
             Ok((Fragment::FragmentTask(_), _)) => {
                 return Err(io::Error::new(

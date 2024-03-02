@@ -42,5 +42,5 @@ fn main() {
         }
     });
 
-    display_fractal.start(rx);
+    let _ = display_fractal.start(rx);
 }

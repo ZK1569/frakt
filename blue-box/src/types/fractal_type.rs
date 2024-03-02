@@ -1,12 +1,9 @@
-use std::cmp::max;
 use std::io::Write;
-use std::ops::{Div, Sub};
-
 use cmplx_nbr::Complex;
 use image::{ImageBuffer, Rgb};
 use log::error;
 use serde::{Deserialize, Serialize};
-use crate::utils::colors::color_palette;
+
 
 use super::{protocols::FragmentTask, desc::Range};
 
@@ -23,7 +20,7 @@ pub trait CalcFractal {
 
         let mut image_buffer: ImageBuffer<Rgb<u8>, Vec<u8>> = ImageBuffer::new(width, height);
 
-        for (x, y, pixel) in image_buffer.enumerate_pixels_mut() {
+        for (x, y, _pixel) in image_buffer.enumerate_pixels_mut() {
 
             let mapped_x = min.x + (x as f64 / width as f64) * (max.x - min.x);
             let mapped_y = min.y + (y as f64 / height as f64) * (max.y - min.y);
@@ -45,7 +42,7 @@ pub trait CalcFractal {
         }
 
 
-        image_buffer.save("./last_image_client.png");
+        let _ = image_buffer.save("./last_image_client.png");
     }
 }
 
