@@ -32,7 +32,6 @@ impl Complex {
 
     pub fn angle(&self) -> f64 {
         (self.im.atan2(self.re) / (2.0 * PI)).rem_euclid(1.0)
-
     }
 
     pub fn norm_square(&self) -> f64 {
@@ -40,10 +39,10 @@ impl Complex {
     }
 
     /// It is possible to obtain the sine of a complex number, which returns a new complex number
-    pub fn sin(&self)-> Complex{
-        Complex{
-            re:(self.re.sin() * self.im.cosh()),
-            im:(self.re.cos() * self.im.sinh())
+    pub fn sin(&self) -> Complex {
+        Complex {
+            re: (self.re.sin() * self.im.cosh()),
+            im: (self.re.cos() * self.im.sinh()),
         }
     }
 
@@ -55,7 +54,6 @@ impl Complex {
             1.
         }
     }
-
 }
 
 /// You can add compelx numbers together
@@ -72,12 +70,11 @@ impl ops::Add for Complex {
 impl ops::Sub for Complex {
     type Output = Self;
     fn sub(self, rhs: Self) -> Self::Output {
-        Self{
-            re : self.re - rhs.re,
+        Self {
+            re: self.re - rhs.re,
             im: self.im - rhs.im,
         }
     }
-
 }
 
 /// You can mult complex numbers together
@@ -101,8 +98,3 @@ impl std::ops::Div for Complex {
         }
     }
 }
-
-
-
-
-

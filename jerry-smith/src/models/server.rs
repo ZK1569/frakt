@@ -1,54 +1,29 @@
-use std::{
-    net::{
-        TcpListener,
-        TcpStream
-    },
-    io, sync::mpsc::Sender,
-};
 use blue_box::{
     models::network::Network,
     types::{
-        protocols::{
-            FragmentRequest,
-            Fragment,
-            FragmentTask,
-            FragmentResult
-        }, 
-        desc::{
-            U8Data,
-            Resolution,
-            Range,
-            Point, PixelIntensity
-        },
-        fractal_type::{
-            FractalDescriptor, 
-            JuliaDescriptor
-        }
-    }
+        desc::{PixelIntensity, Point, Range, Resolution, U8Data},
+        fractal_type::{FractalDescriptor, JuliaDescriptor},
+        protocols::{Fragment, FragmentRequest, FragmentResult, FragmentTask},
+    },
 };
 use cmplx_nbr::Complex;
-use log::{trace, info, debug, warn};
+use log::{debug, info, trace, warn};
 use rand::Rng;
+use std::{
+    io,
+    net::{TcpListener, TcpStream},
+    sync::mpsc::Sender,
+};
 
 #[derive(Debug)]
 pub struct Server {
     network: Network,
-    width: u16,
-    height: u16
 }
 
 impl Server {
-
-    pub fn new(
-        server_address: String,
-        port: String,
-        width: u16,
-        height: u16
-    ) -> Server{
+    pub fn new(server_address: String, port: String, _width: u16, _height: u16) -> Server {
         Server {
             network: Network::new(server_address, port),
-            width,
-            height
         }
     }
 
@@ -56,13 +31,15 @@ impl Server {
         TcpListener::bind(self.network.get_fulladdress())
     }
 
-    pub fn read_messge_from_client(stream: &mut TcpStream) -> Result<(Fragment, Vec<u8>), io::Error>{
+    pub fn read_messge_from_client(
+        stream: &mut TcpStream,
+    ) -> Result<(Fragment, Vec<u8>), io::Error> {
         return Network::read_message(stream);
     }
 
     pub fn send_work(
         stream: &mut TcpStream,
-        fragment_request: &FragmentRequest
+        _fragment_request: &FragmentRequest,
     ) -> Result<(), io::Error> {
         let test_fragment_task = FragmentTask {
             id: U8Data {
@@ -71,14 +48,17 @@ impl Server {
             },
             fractal: {
                 FractalDescriptor::Julia(JuliaDescriptor {
-                    c: Complex{ re: 0.285, im: 0.013 },
+                    c: Complex {
+                        re: 0.285,
+                        im: 0.013,
+                    },
                     divergence_threshold_square: 4.0,
                 })
             },
             max_iteration: 64,
-            resolution: Resolution { nx: 400, ny: 400},
+            resolution: Resolution { nx: 400, ny: 400 },
             range: Range {
-                min: Point { x: -1.2, y:-1.},
+                min: Point { x: -1.2, y: -1. },
                 max: Point { x: 1.2, y: 1.2 },
             },
         };
@@ -95,37 +75,37 @@ impl Server {
     pub fn get_work_done(
         fragment_result: &FragmentResult,
         data: Vec<u8>,
-        tx: &Sender<Vec<PixelIntensity>>
+        tx: &Sender<Vec<PixelIntensity>>,
     ) -> Result<(), io::Error> {
         warn!("fragment : {fragment_result:?}");
         trace!("Data recived : {data:?}");
 
-        tx.send(Server::from_data_to_pixel_intensity(&data[16..]));
+        let _ = tx.send(Server::from_data_to_pixel_intensity(&data[16..]));
 
         Ok(())
     }
 
     pub fn handle_client(
         stream: &mut TcpStream,
-        tx: &Sender<Vec<PixelIntensity>>
+        tx: &Sender<Vec<PixelIntensity>>,
     ) -> Result<(), io::Error> {
         info!("Incoming connection {stream:?}");
 
-        match Server::read_messge_from_client(stream){
+        match Server::read_messge_from_client(stream) {
             Ok((Fragment::FragmentRequest(fragment), _)) => {
                 debug!("Work request received");
-                Server::send_work(stream, &fragment);
-            },
+                let _ = Server::send_work(stream, &fragment);
+            }
             Ok((Fragment::FragmentResult(fragment), data)) => {
                 debug!("Work done");
-                Server::get_work_done(&fragment, data, tx);
-            },
+                let _ = Server::get_work_done(&fragment, data, tx);
+            }
             Ok((Fragment::FragmentTask(_), _)) => {
                 return Err(io::Error::new(
                     io::ErrorKind::UnexpectedEof,
                     "The worker send a task",
                 ));
-            },
+            }
             Err(err) => {
                 return Err(err);
             }

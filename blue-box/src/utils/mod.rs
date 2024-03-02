@@ -1,5 +1,4 @@
-pub mod json;
 pub mod colors;
-mod json_test;
 mod colors_test;
-
+pub mod json;
+mod json_test;
