@@ -5,6 +5,8 @@ use log::error;
 use serde::{Deserialize, Serialize};
 
 
+use crate::utils::colors::color_palette;
+
 use super::{protocols::FragmentTask, desc::Range};
 
 pub trait CalcFractal {
@@ -20,7 +22,7 @@ pub trait CalcFractal {
 
         let mut image_buffer: ImageBuffer<Rgb<u8>, Vec<u8>> = ImageBuffer::new(width, height);
 
-        for (x, y, _pixel) in image_buffer.enumerate_pixels_mut() {
+        for (x, y, pixel) in image_buffer.enumerate_pixels_mut() {
 
             let mapped_x = min.x + (x as f64 / width as f64) * (max.x - min.x);
             let mapped_y = min.y + (y as f64 / height as f64) * (max.y - min.y);
@@ -35,10 +37,11 @@ pub trait CalcFractal {
                 error!("Can't add to data")
             }
 
-            // let (red, green, blue) = Rgb{0: color_palette(count) as [u8; 3]};
-            // pixel[0] = red;
-            // pixel[1] = green;
-            // pixel[2] = blue;
+            let (red, green, blue) = color_palette(count);
+            let rgb = Rgb{0: [red, green, blue]};
+            pixel[0] = rgb[0];
+            pixel[1] = rgb[1];
+            pixel[2] = rgb[2];
         }
 
 
