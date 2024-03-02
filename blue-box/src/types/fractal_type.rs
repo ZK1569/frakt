@@ -67,12 +67,20 @@ pub struct NewtonRaphsonZ3 {}
 pub struct NewtonRaphsonZ4 {}
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
+pub struct NovaNewtonRaphsonZ3 {}
+
+#[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
+pub struct NovaNewtonRaphsonZ4 {}
+
+#[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
 pub enum FractalDescriptor {
     Julia(JuliaDescriptor),
     Mandelbrot(Mandelbrot),
     IteratedSinZ(IteratedSinZ),
     NewtonRaphsonZ3(NewtonRaphsonZ3),
     NewtonRaphsonZ4(NewtonRaphsonZ4),
+    NovaNewtonRaphsonZ3(NovaNewtonRaphsonZ3),
+    NovaNewtonRaphsonZ4(NovaNewtonRaphsonZ4)
 }
 
 impl CalcFractal for JuliaDescriptor {
@@ -164,7 +172,7 @@ impl NewtonRaphsonZ4 {
         z * z * z * z - Complex::new(1.0, 0.0)
     }
 
-    fn dfn(&self, z: Complex) -> Complex {
+    fn dfz(&self, z: Complex) -> Complex {
         Complex::new(4.0, 0.0) * z * z * z
     }
 }
@@ -177,7 +185,7 @@ impl CalcFractal for NewtonRaphsonZ4 {
         let mut i = 0;
 
         loop {
-            zn_next = z - (self.fz(z) / self.dfn(z));
+            zn_next = z - (self.fz(z) / self.dfz(z));
             if (zn_next - z).norm() < epsilon || i >= *max_iteration {
                 break;
             }
@@ -192,5 +200,75 @@ impl CalcFractal for NewtonRaphsonZ4 {
         };
 
         return (zn as f32, i as f32 * count / *max_iteration as f32);
+    }
+}
+
+impl NovaNewtonRaphsonZ3 {
+    pub fn new() -> Self {
+        Self {}
+    }
+
+    fn fz(&self, z: Complex) -> Complex {
+        z * z * z - Complex::new(1.0, 0.0)
+    }
+
+    fn dfz(&self, z: Complex) -> Complex {
+        Complex::new(3.0, 0.0) * z * z
+    }
+}
+
+impl CalcFractal for NovaNewtonRaphsonZ3 {
+    fn determine_pixel_intensity(&self, x: f64, y: f64, max_iteration: &u32) -> (f32, f32) {
+        let c = Complex::new(x, y);
+        let mut z = Complex::new(1.0, 0.0);
+        let mut zn_next;
+        let epsilon = 1e-6;
+        let mut i = 0;
+
+        loop {
+            zn_next = z - (self.fz(z) / self.dfz(z)) + c;
+            if (zn_next - z).norm() < epsilon || i >= *max_iteration {
+                break;
+            }
+            z = zn_next;
+            i += 1;
+        }
+
+        return (0.0, i as f32 / *max_iteration as f32);
+    }
+}
+
+impl NovaNewtonRaphsonZ4 {
+    pub fn new() -> Self {
+        Self {}
+    }
+
+    fn fz(&self, z: Complex) -> Complex {
+        z * z * z * z - Complex::new(1.0, 0.0)
+    }
+
+    fn dfz(&self, z: Complex) -> Complex {
+        Complex::new(4.0, 0.0) * z * z * z
+    }
+}
+
+impl CalcFractal for NovaNewtonRaphsonZ4 {
+    fn determine_pixel_intensity(&self, x: f64, y: f64, max_iteration: &u32) -> (f32, f32) {
+        let c = Complex::new(x, y);
+        let mut z = Complex::new(1.0, 0.0);
+        let mut zn_next;
+        let epsilon = 1e-6;
+        let mut i = 0;
+
+        loop {
+            zn_next = z - (self.fz(z) / self.dfz(z)) + c;
+            if (zn_next - z).norm_square() < epsilon || i >= *max_iteration {
+                break;
+            }
+            z = zn_next;
+            i += 1;
+        }
+
+        return (0.0, i as f32 / *max_iteration as f32);
     }
 }

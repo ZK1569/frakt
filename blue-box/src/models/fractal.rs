@@ -29,6 +29,8 @@ impl Fractal {
             FractalDescriptor::IteratedSinZ(iter) => iter.make_image(&fragment_task, data),
             FractalDescriptor::NewtonRaphsonZ3(newton) => newton.make_image(&fragment_task, data),
             FractalDescriptor::NewtonRaphsonZ4(newton) => newton.make_image(&fragment_task, data),
+            FractalDescriptor::NovaNewtonRaphsonZ3(newton) => newton.make_image(&fragment_task, data),
+            FractalDescriptor::NovaNewtonRaphsonZ4(newton) => newton.make_image(&fragment_task, data),
         };
 
         fragment_result
