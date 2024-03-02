@@ -1,18 +1,24 @@
-use std::{net::{TcpStream, Shutdown}, io::{self, Write, Read}};
+use std::{
+    io::{self, Read, Write},
+    net::{Shutdown, TcpStream},
+};
 
-use log::{debug, warn, error};
+use log::{debug, error, warn};
 
 use crate::{types::protocols::Fragment, utils::json};
 
 #[derive(Debug)]
 pub struct Network {
     server_address: String,
-    port: String
+    port: String,
 }
 
-impl Network  {
-    pub fn new(server_address: String, port: String) -> Network{
-        Network {server_address, port}
+impl Network {
+    pub fn new(server_address: String, port: String) -> Network {
+        Network {
+            server_address,
+            port,
+        }
     }
 
     pub fn get_fulladdress(&self) -> String {
@@ -22,9 +28,8 @@ impl Network  {
     pub fn send_message(
         stream: &mut TcpStream,
         fragment: Fragment,
-        data: &Vec<u8>
-    ) -> Result<String , io::Error> {
-
+        data: &Vec<u8>,
+    ) -> Result<String, io::Error> {
         let json_message = json::to_string(&fragment)?;
 
         let json_message_size = json_message.len() as u32;
@@ -39,15 +44,14 @@ impl Network  {
         Ok(json_message)
     }
 
-    pub fn read_message(stream: &mut TcpStream) -> Result<(Fragment , Vec<u8>), io::Error> {
+    pub fn read_message(stream: &mut TcpStream) -> Result<(Fragment, Vec<u8>), io::Error> {
         let mut total_len_buf = [0; 4];
-        match stream.read_exact(&mut total_len_buf){
+        match stream.read_exact(&mut total_len_buf) {
             Ok(_) => debug!("Start getting something"),
             Err(err) => {
                 warn!("Something's wrong, I can't receive the total message size");
                 return Err(err);
-            } 
-            
+            }
         };
         let total_message_size = u32::from_be_bytes(total_len_buf);
 
@@ -82,7 +86,7 @@ impl Network  {
         };
 
         let mut data = vec![0_u8; data_message_size as usize];
-        if let Err(e) = stream.read_exact(&mut data){
+        if let Err(e) = stream.read_exact(&mut data) {
             error!("Failed to read binary data: {}", e);
             return Err(e.into());
         }

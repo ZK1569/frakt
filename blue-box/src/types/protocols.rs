@@ -1,12 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 use super::{
-    desc::{
-        U8Data,
-        Resolution,
-        Range,
-        PixelData
-    }, 
+    desc::{PixelData, Range, Resolution, U8Data},
     fractal_type::FractalDescriptor,
 };
 
@@ -41,15 +36,17 @@ pub struct FragmentResult {
 }
 
 impl FragmentResult {
-    pub fn new(id: U8Data, resolution: Resolution, range: Range, pixels: PixelData) -> FragmentResult{
+    pub fn new(
+        id: U8Data,
+        resolution: Resolution,
+        range: Range,
+        pixels: PixelData,
+    ) -> FragmentResult {
         FragmentResult {
             id,
             resolution,
             range,
-            pixels
+            pixels,
         }
     }
 }
-
-
-

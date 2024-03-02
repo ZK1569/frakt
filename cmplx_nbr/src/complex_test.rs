@@ -36,21 +36,19 @@ fn cal_norm() {
     assert_eq!(13.0, _3_2i.norm());
     assert_eq!(50.0, _1_7i.norm());
     assert_eq!(650.0, __11_23i.norm());
-
 }
 
 #[test]
-fn test_div(){
+fn test_div() {
     let _3_2i = Complex::new(3_f64, 2_f64);
     let _3_2i = Complex::new(3_f64, 2_f64);
     let _1_0i = Complex::new(1_f64, 0_f64);
 
     assert_eq!(_3_2i / _3_2i, _1_0i);
-
 }
 
 #[test]
-fn test_sub(){
+fn test_sub() {
     let _13_4i = Complex::new(13_f64, 4_f64);
     let _7_2i = Complex::new(7_f64, 2_f64);
 
@@ -58,4 +56,3 @@ fn test_sub(){
 
     assert_eq!(_13_4i - _7_2i, _6_2i);
 }
-

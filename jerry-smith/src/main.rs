@@ -1,11 +1,15 @@
 mod models;
 mod utils;
 
-use std::{process, thread, sync::mpsc::{self, Sender, Receiver} };
+use std::{
+    process,
+    sync::mpsc::{self, Receiver, Sender},
+    thread,
+};
 
 use blue_box::types::desc::PixelIntensity;
 use log::{error, warn};
-use models::{server::Server, display::DisplayFractal};
+use models::{display::DisplayFractal, server::Server};
 use utils::config::Config;
 
 fn main() {
@@ -17,7 +21,12 @@ fn main() {
 
     let display_fractal = DisplayFractal::new(config.width, config.height);
 
-    let server = Server::new(config.server_address, config.port, config.width, config.height);
+    let server = Server::new(
+        config.server_address,
+        config.port,
+        config.width,
+        config.height,
+    );
     let listener_result = server.start_server();
 
     let listener = match listener_result {
